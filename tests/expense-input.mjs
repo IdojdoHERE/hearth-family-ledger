@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {amountToCents,readQueue,writeQueue,queueKey} from '../lib/expense-input.ts';
+for(const [s,n] of [['12.50',1250],['12,50',1250],['1',100],['0.01',1],[' 7,2 ',720],['1000000',100000000]])assert.equal(amountToCents(s),n);
+for(const s of ['','-1','0','1,234.56','1.234,56','12.345','1e3','1000001','NaN'])assert.equal(amountToCents(s),null);
+const memory=new Map();globalThis.localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,v)};globalThis.window={dispatchEvent:()=>{}};
+const item={clientId:'unique',expectedMember:'alice',amount:1250,description:'Food',category:'Groceries',date:'2026-10-31',action:'expense'};
+writeQueue('alice',[item]);assert.equal(readQueue('alice').length,1);assert.equal(readQueue('bob').length,0);
+memory.set(queueKey('bob'),JSON.stringify([item]));assert.equal(readQueue('bob').length,0);
+writeQueue('alice',[]);assert.equal(readQueue('alice').length,0);
+console.log('PASS: decimal separators, amount limits, invalid input, persistent queue, and account-scoped pending expenses.');
