@@ -1,10 +1,12 @@
 # Hearth
 
-[Working app](https://hearth-family-ledger.ceramdent.chatgpt.site) · [Issues](https://github.com/IdojdoHERE/hearth-family-ledger/issues) · [Owner guide](OWNER-GUIDE.md)
+[Free-hosted app](https://hearth-family-ledger.aidjahja008.workers.dev) · [Issues](https://github.com/IdojdoHERE/hearth-family-ledger/issues) · [Owner guide](OWNER-GUIDE.md)
 
 **A little clarity. A lot more together.**
 
 A phone-first family expense register with separate household spaces, personal sign-ins, monthly spending summaries, and shared savings goals. EUR is the default; each family selects its currency at registration.
+
+The live app runs on the owner’s Cloudflare Workers Free plan with D1. The previous Sites app remains at https://hearth-family-ledger.ceramdent.chatgpt.site. These deployments have separate databases: existing accounts and records are not automatically transferred.
 
 ## Included
 

@@ -1,12 +1,14 @@
 # Your Hearth app: a practical owner’s guide
 
-Updated 31 October 2026. No coding experience is needed to follow this guide.
+Updated 1 November 2026. No coding experience is needed to follow this guide.
 
 ## My recommendation
 
-Use Hearth as a **phone web app with a shared online database**. Keep the existing address while your family tries it. A custom domain is optional, and there is no need to buy a server or pay app-store fees to use this version.
+Use Hearth as a **phone web app with a shared online database**. The new free address is ready for your family. A custom domain is optional, and there is no need to buy a server or pay app-store fees to use this version.
 
-Your app: https://hearth-family-ledger.ceramdent.chatgpt.site
+Your free-hosted app: https://hearth-family-ledger.aidjahja008.workers.dev
+
+The previous app and its existing accounts/expenses remain at https://hearth-family-ledger.ceramdent.chatgpt.site. The new app has a separate database. Create a family on the new app to start there; data and passwords have not been migrated. Keep the old link and export its records before any later migration.
 
 The app was built with AI assistance. It does not call a paid AI service when you record expenses, and it does not send your family’s spending to an AI provider.
 
@@ -15,9 +17,9 @@ The app was built with AI assistance. It does not call a paid AI service when yo
 | Part | Plain-language meaning | Your app |
 | --- | --- | --- |
 | The web app | The screens and buttons you use | Hearth |
-| Hosting | The service that keeps the app available while your computer is off | Currently supplied through Sites |
+| Hosting | The service that keeps the app available while your computer is off | Your personal Cloudflare Workers Free account |
 | Database | The private shared record of accounts and expenses | Cloudflare D1, attached to the hosted app |
-| Domain | The address people type or share | You already have a hosted address; a purchased name is optional |
+| Domain | The address people type or share | Cloudflare supplies the workers.dev address; a purchased name is optional |
 | Git | A version history of the code | Helps track changes and recover an earlier source version |
 | GitHub repository | An online home for the source code and contributions | Source is published on GitHub |
 | PWA / phone web app | A website opened from a phone’s home-screen icon | Included in the mobile version |
@@ -76,8 +78,8 @@ A fully offline, once-a-month device merge is possible as a different product, b
 
 | Option | Cost position | Recommendation |
 | --- | --- | --- |
-| Keep the current Sites address | Already hosted; no separate domain or server has been purchased. Account-specific Sites quotas/billing have not been verified here. | Use this for the family trial. Do not buy another service just to get started. |
-| Your own Cloudflare deployment | A free tier exists. Workers currently includes 100,000 requests/day with a 10 ms CPU limit per request. D1 has free usage/storage allowances. | A possible low-cost independent home, after testing the actual app against its limits. |
+| Keep the current Sites address | Already hosted; no separate domain or server has been purchased. Account-specific Sites quotas/billing have not been verified here. | This previous address still holds your original records. |
+| Your own Cloudflare deployment | A free tier exists. Workers currently includes 100,000 requests/day with a 10 ms CPU limit per request. D1 has free usage/storage allowances. | Deployed and smoke-tested on the current Free plan. Free quotas still apply. |
 | Cloudflare Workers Paid | Starts with a $5/month subscription, plus usage above included allowances and applicable taxes. | A fallback if free-plan limits are too restrictive; this is not a guaranteed maximum bill. |
 | GitHub personal Free | Public/private repositories are available on the free plan. | Enough to share source and accept contributions. |
 | Custom domain | Optional recurring registrar charge. | Buy later only if you want a memorable name. |
