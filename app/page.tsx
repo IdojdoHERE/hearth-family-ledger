@@ -72,6 +72,12 @@ export default function Page() {
     const requestId = useRef(0);
     const money = (c: number) => new Intl.NumberFormat(numberLocale(locale), { style: 'currency', currency: data.family.currency }).format(c / 100);
     const monthLabel = calendarDate(new Date(month + '-01T12:00:00'),locale, { month: 'long', year: 'numeric' });
+    function clearInvitationUrl() {
+        const url = new URL(window.location.href);
+        if (!url.searchParams.has('invite')) return;
+        url.searchParams.delete('invite');
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    }
     async function refresh(m = month, initial = false) { const id = ++requestId.current; try {
         const r = await fetch('/api/household?month=' + m);
         if (r.status === 401) {
@@ -88,6 +94,11 @@ export default function Page() {
             setData(d);
             setDemo(false);
             setWelcome(false);
+            // An existing session goes straight into its own family, even from an old invitation.
+            if (initial && new URLSearchParams(window.location.search).has('invite')) {
+                setModal(null);
+                clearInvitationUrl();
+            }
             if (initial && new URLSearchParams(window.location.search).has('quick')) {
                 setQuick(true);
                 window.history.replaceState({}, '', window.location.pathname);
@@ -106,18 +117,22 @@ export default function Page() {
     useEffect(() => { refresh(initialMonth, true); const t = new URLSearchParams(window.location.search).get('invite'); if (t) {
         setInvite(t);
         setModal('join');
-        window.history.replaceState({}, '', window.location.pathname);
+        // Keep the invitation in the address until registration succeeds, so reloads can retry.
     } }, []);
     useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }); }, [tab]);
     useEffect(() => { if (demo)
         return; const update = () => { if (navigator.onLine && document.visibilityState === 'visible')
         refresh(month); }; window.addEventListener('focus', update); window.addEventListener('online', update); const timer = setInterval(update, 60000); return () => { window.removeEventListener('focus', update); window.removeEventListener('online', update); clearInterval(timer); }; }, [demo, month]);
-    useEffect(() => { if (modal) {
+    useEffect(() => {
+        // Initial invitation state is set while the loading screen has no dialog yet.
+        // Open it once the session check finishes and the dialog is mounted.
+        if (loading) return;
+        if (modal) {
         setError('');
         dialog.current?.showModal();
     }
     else
-        dialog.current?.close(); }, [modal]);
+        dialog.current?.close(); }, [modal, loading]);
     useEffect(() => { if (!toast)
         return; const t = setTimeout(() => setToast(''), 5000); return () => clearTimeout(t); }, [toast]);
     async function api(payload: any) { const r = await fetch('/api/household', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const d: any = await r.json(); if (!r.ok)
@@ -144,6 +159,8 @@ export default function Page() {
         try {
             if (['login', 'register', 'join'].includes(modal || '')) {
                 await api({ ...f, action: modal, size: Number(f.size) });
+                clearInvitationUrl();
+                setInvite('');
                 setMonth(initialMonth);
                 await refresh(initialMonth);
                 setModal(null);
