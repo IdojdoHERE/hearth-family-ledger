@@ -1,4 +1,4 @@
-name: Check Hearth
+name: Check Family Ledger
 on:
   push:
     branches: [main]

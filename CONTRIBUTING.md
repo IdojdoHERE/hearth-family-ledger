@@ -1,6 +1,6 @@
-# Contributing to Hearth
+# Contributing to Family Ledger
 
-Welcome! Hearth is a calm, collaborative expense register for families.
+Welcome! Family Ledger is a calm, collaborative expense register for families.
 
 1. Fork the repository and follow README.md to run it locally.
 2. Open an issue describing the problem or feature before a large change.

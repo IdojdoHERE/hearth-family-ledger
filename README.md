@@ -1,4 +1,4 @@
-# Hearth
+# Family Ledger
 
 [Free-hosted app](https://hearth-family-ledger.aidjahja008.workers.dev) · [Issues](https://github.com/IdojdoHERE/hearth-family-ledger/issues) · [Owner guide](OWNER-GUIDE.md)
 
@@ -96,3 +96,9 @@ No runtime AI service is used. The app was developed with AI assistance; family 
 ## Optional continuous integration
 
 An example GitHub Actions workflow is in `docs/github-actions-example.yml`. Repository maintainers can enable it under `.github/workflows/` when their publishing credentials include workflow permissions. The test commands above also run locally without any GitHub secrets.
+
+## Languages (v1.1.0)
+
+English and Albanian (Shqip) are included. The header and welcome page offer a language selector; the choice is stored on the device. Interface translations live in `lib/i18n.ts`. Stored category identifiers remain stable in English; labels are translated for display. Member names and expense notes are never automatically translated. Albanian date labels and European number formatting also work in browsers without Albanian Intl locale data. Run `node tests/i18n.mjs` to verify translations and formatting.
+
+The displayed app name is Family Ledger. The existing Worker name, repository URL, session cookie, queue keys and PWA identity are retained so existing users continue using the same app and data. See [OWNER-GUIDE.md](OWNER-GUIDE.md) for the hosting, domain and free-plan explanation.

@@ -1,10 +1,10 @@
-# Your Hearth app: a practical owner’s guide
+# Your Family Ledger app: a practical owner’s guide
 
 Updated 1 November 2026. No coding experience is needed to follow this guide.
 
 ## My recommendation
 
-Use Hearth as a **phone web app with a shared online database**. The new free address is ready for your family. A custom domain is optional, and there is no need to buy a server or pay app-store fees to use this version.
+Use Family Ledger as a **phone web app with a shared online database**. The new free address is ready for your family. A custom domain is optional, and there is no need to buy a server or pay app-store fees to use this version.
 
 Your free-hosted app: https://hearth-family-ledger.aidjahja008.workers.dev
 
@@ -16,7 +16,7 @@ The app was built with AI assistance. It does not call a paid AI service when yo
 
 | Part | Plain-language meaning | Your app |
 | --- | --- | --- |
-| The web app | The screens and buttons you use | Hearth |
+| The web app | The screens and buttons you use | Family Ledger |
 | Hosting | The service that keeps the app available while your computer is off | Your personal Cloudflare Workers Free account |
 | Database | The private shared record of accounts and expenses | Cloudflare D1, attached to the hosted app |
 | Domain | The address people type or share | Cloudflare supplies the workers.dev address; a purchased name is optional |
@@ -42,7 +42,7 @@ There is no public family directory. Joining requires an invitation. Members see
 
 **iPhone:** Open the address in Safari → Share → Add to Home Screen. Enable **Open as Web App** if offered. [Apple’s instructions](https://support.apple.com/en-eg/guide/iphone/iphea86e5236/ios).
 
-**Android:** Open the address in Chrome → ⋮ menu → Install app or Add to Home screen. If Hearth offers an install button, you can use it. Browser wording varies. [Web-app installation guide](https://web.dev/learn/pwa/installation/).
+**Android:** Open the address in Chrome → ⋮ menu → Install app or Add to Home screen. If Family Ledger offers an install button, you can use it. Browser wording varies. [Web-app installation guide](https://web.dev/learn/pwa/installation/).
 
 Each family member installs the same link and signs in using their own account. Installation is not the same as registration.
 
@@ -74,24 +74,58 @@ Important practical limits:
 
 A fully offline, once-a-month device merge is possible as a different product, but it adds file sharing, duplicate detection, conflicting edits, and the risk of a lost phone losing a month’s records. I recommend the shared online ledger for your family.
 
-## Costs and the cheapest sensible path
+## English and Shqip
 
-| Option | Cost position | Recommendation |
+Choose **Language / Gjuha → Shqip** on the welcome page or in the app header. Choose **English** to switch back. Each device remembers its own choice. The interface, categories, forms, messages, dates and amounts change language; family/member names and your written notes stay exactly as entered. Your accounts, records and totals are unchanged. Browser-owned date pickers may follow the phone's own language.
+
+## Where the online app lives
+
+| Part | What it does | Who provides it |
 | --- | --- | --- |
-| Keep the current Sites address | Already hosted; no separate domain or server has been purchased. Account-specific Sites quotas/billing have not been verified here. | This previous address still holds your original records. |
-| Your own Cloudflare deployment | A free tier exists. Workers currently includes 100,000 requests/day with a 10 ms CPU limit per request. D1 has free usage/storage allowances. | Deployed and smoke-tested on the current Free plan. Free quotas still apply. |
-| Cloudflare Workers Paid | Starts with a $5/month subscription, plus usage above included allowances and applicable taxes. | A fallback if free-plan limits are too restrictive; this is not a guaranteed maximum bill. |
-| GitHub personal Free | Public/private repositories are available on the free plan. | Enough to share source and accept contributions. |
-| Custom domain | Optional recurring registrar charge. | Buy later only if you want a memorable name. |
-| Native App Store / Play Store app | Adds separate release, review and maintenance work. | Not needed for this phone web app. |
+| Phone browser / home-screen icon | Displays Family Ledger and sends your entries securely over HTTPS. | Your phone/browser |
+| Cloudflare Worker | Serves the app, checks sign-ins and permissions, and handles expenses. | Your Cloudflare account |
+| Cloudflare D1 database | Stores family accounts, expenses, budgets and goals centrally, so devices share the same records. | Your Cloudflare account |
+| GitHub repository | Stores the app's source code and version history for development and contributions. It does not store the live family database. | Your GitHub account |
 
-Pricing checked on 31 October 2026: [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/), [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/), [GitHub plans](https://docs.github.com/en/get-started/learning-about-github/githubs-plans).
+Your laptop and this chat do not need to stay open. After an expense reaches the server, another signed-in family member can see it by reopening or refreshing their app. Unsent phone entries must sync before they appear on other devices.
 
-The free Workers CPU limit is separate from traffic volume. Rendering and password processing must be measured before promising a free independent deployment. A home-screen icon does not remove the need for online hosting if multiple phones share records. Your current hosting is not automatically covered by the prices of a separate personal Cloudflare account.
+## Where the address comes from
+
+The address is **https://hearth-family-ledger.aidjahja008.workers.dev**.
+
+- `workers.dev` is Cloudflare's domain.
+- `aidjahja008` is your Cloudflare account subdomain.
+- `hearth-family-ledger` identifies this deployed app.
+
+Cloudflare supplies this address; you have not bought a domain. There is no domain renewal fee for this supplied subdomain. **Family Ledger** is now the app's displayed name. The address deliberately stays the same so current phone shortcuts, sign-ins and waiting expenses keep using the same service. A custom domain such as a separately purchased `.com` is optional and would have its own renewal cost. Availability and price would need checking before purchase.
+
+[Cloudflare's explanation of workers.dev addresses](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/).
+
+## Cost and how long it can keep working
+
+The deployment is on Cloudflare's **Free ($0)** plan. This update does not enable a paid plan, purchase a domain or add a subscription. There is no trial countdown or scheduled shutdown configured in Family Ledger. Signing out or a session expiring does not stop hosting: sign in again.
+
+It can continue running while your Cloudflare account and deployment remain active, the service remains available, and usage stays within the plan's limits. This is not a promise of free lifetime hosting: providers can change plans or terms, limits can be reached, and software needs occasional maintenance. Keep access to your GitHub and Cloudflare accounts and their recovery methods.
+
+Current published allowances, checked 1 November 2026:
+
+| Free resource | Allowance |
+| --- | --- |
+| Worker requests | 100,000 per day; static asset requests are free and unlimited |
+| Worker CPU | 10 ms per invocation; this is a separate limit from traffic |
+| D1 reads | 5 million database rows read per day |
+| D1 writes | 100,000 database rows written per day |
+| D1 storage | 5 GB total per account |
+
+A request is not one expense: opening screens, signing in and saving can each make requests, and one operation can read/write several database rows. These are account-wide allowances shared with other apps using the same account. Daily quota exhaustion can interrupt requests until the quota resets; reaching storage limits needs space freed or a deliberate plan change. Reaching a quota does not make this app automatically subscribe you to a paid plan. Monitor usage in Cloudflare as more families join.
+
+Sources: [Workers pricing and limits](https://developers.cloudflare.com/workers/platform/pricing/), [D1 pricing and limit behavior](https://developers.cloudflare.com/d1/platform/pricing/).
+
+GitHub and hosting are separate. Deleting or changing source code on GitHub does not itself update the running app. This project currently uses a deliberate build/test/deploy process, rather than automatic deployment on every contribution. If Cloudflare hosting ever needs replacing, the source helps rebuild the app elsewhere; private data exports are also needed to preserve records. A JSON export is a readable backup, not an automatic restore feature.
 
 ## Monthly routine and backups
 
-1. Have each member open Hearth and check that no expenses are waiting to sync.
+1. Have each member open Family Ledger and check that no expenses are waiting to sync.
 2. Select the month. Review category totals and individual expenses together.
 3. Export the monthly CSV if you want to use Excel or keep a simple report.
 4. In **Family settings**, choose **Download all family records** for an all-month JSON snapshot of members, expenses and goals.
@@ -121,4 +155,4 @@ The app has automated tests and browser checks. It has not undergone an independ
 
 ## Your next small step
 
-Create your real family, install the icon on two phones, and each record one small expense. Check that both phones show the same two expenses. Then try one monthly export. That is the clearest way to build confidence before inviting more families or publishing the source.
+Create your real family, install the icon on two phones, and each record one small expense. Check that both phones show the same two expenses. Then try one monthly export. That is the clearest way to build confidence before inviting more families.
