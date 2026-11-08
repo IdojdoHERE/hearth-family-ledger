@@ -93,7 +93,7 @@ export const albanian: Record<string,string> = {
   "Family login:": "Emri për kyçje:",
   "Family member": "Anëtar i familjes",
   "Family name": "Emri i familjes",
-  "Family names, account names, expenses, budgets, and savings goals are stored on the server. Passwords are salted and hashed. A necessary sign-in cookie keeps you logged in for up to seven days. No advertising or analytics trackers are included.": "Emrat e familjeve, llogaritë, shpenzimet, buxhetet dhe synimet ruhen në server. Fjalëkalimet ruhen si vlera të përpunuara me hash dhe kripë të rastësishme. Një cookie e domosdoshme ju mban të kyçur deri në shtatë ditë. Nuk përdoren gjurmues reklamash ose analitikash.",
+  "Family names, account names, expenses, budgets, and savings goals are stored on the server. Passwords are salted and hashed. You stay signed in until you sign out or your account sessions are revoked. The sign-in cookie renews while you use the app; clearing browser data or browser limits can require you to sign in again. No advertising or analytics trackers are included.": "Emrat e familjeve, llogaritë, shpenzimet, buxhetet dhe synimet ruhen në server. Fjalëkalimet ruhen si vlera të përpunuara me hash dhe kripë të rastësishme. Qëndroni të kyçur derisa të çkyçeni ose të revokohen sesionet e llogarisë. Cookie rinovohet gjatë përdorimit; fshirja e të dhënave ose kufizimet e shfletuesit mund të kërkojnë kyçje të re. Nuk përdoren gjurmues reklamash ose analitikash.",
   "Family settings": "Cilësimet e familjes",
   "Filter by category": "Filtro sipas kategorisë",
   "Filter by member": "Filtro sipas anëtarit",

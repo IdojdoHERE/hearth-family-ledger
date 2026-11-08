@@ -3,6 +3,10 @@ export const dynamic = 'force-dynamic';
 const categories=['Groceries','Home & bills','Transport','Food & coffee','Health','Fun & family','Shopping','Other'];
 const currencies=['EUR','USD','GBP','RSD','CHF','CAD','AUD'];
 const now=()=>Date.now(),uid=()=>crypto.randomUUID();
+// Browsers cap persistent cookies; renew on authenticated activity. In D1,
+// expires=0 means valid until sign-out, password change, recovery or revocation.
+const COOKIE_MAX_AGE=400*24*60*60;
+const authenticatedTokens=new WeakMap<Request,string>();
 const hex=(b:ArrayBuffer)=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
 async function hash(s:string){return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));}
 async function passwordHash(password:string,salt:string){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:100000,hash:'SHA-256'},k,256));}
@@ -14,10 +18,21 @@ function money(value:unknown,zero=false){if(typeof value!=='number'||!Number.isS
 function validDate(value:unknown){const s=str(value,'Date',10,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(Date.parse(s))||new Date(s).toISOString().slice(0,10)!==s)fail('Choose a valid date.');return s;}
 function db(){if(!env.DB)fail('The family database is unavailable. Please try again later.',503);return env.DB!;}
 function response(body:unknown,status=200,cookie?:string){return Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...(cookie?{'Set-Cookie':cookie}:{})}});}
-function cookie(token:string,req:Request,maxAge=604800){return `hearth_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${new URL(req.url).protocol==='https:'?'; Secure':''}`;}
-async function session(req:Request){const token=(req.headers.get('cookie')||'').match(/(?:^|;\s*)hearth_session=([a-f0-9-]{73})/)?.[1];if(!token)fail('Please sign in to your family.',401);const user=await db().prepare('SELECT m.id,m.family,m.name,m.username,m.role FROM sessions s JOIN members m ON m.id=s.member WHERE s.token=? AND s.expires>?').bind(await hash(token!),now()).first<any>();if(!user)fail('Your session expired. Please sign in again.',401);return user;}
+function cookie(token:string,req:Request,maxAge=COOKIE_MAX_AGE){return `hearth_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${new URL(req.url).protocol==='https:'?'; Secure':''}`;}
+async function session(req:Request){
+ const token=(req.headers.get('cookie')||'').match(/(?:^|;\s*)hearth_session=([a-f0-9-]{73})/)?.[1];
+ if(!token)fail('Please sign in to your family.',401);
+ const digest=await hash(token!);
+ const user=await db().prepare('SELECT m.id,m.family,m.name,m.username,m.role,s.expires AS sessionExpires FROM sessions s JOIN members m ON m.id=s.member WHERE s.token=? AND (s.expires=0 OR s.expires>?)').bind(digest,now()).first<any>();
+ if(!user)fail('Your session expired. Please sign in again.',401);
+ // Upgrade a still-valid legacy seven-day session; never revive expired sessions.
+ if(user.sessionExpires!==0)await db().prepare('UPDATE sessions SET expires=0 WHERE token=? AND expires>?').bind(digest,now()).run();
+ delete user.sessionExpires;
+ authenticatedTokens.set(req,token!);
+ return user;
+}
 async function limit(req:Request,identity:string){const key=await hash(`${req.headers.get('cf-connecting-ip')||'local'}:${identity}`),time=now();await db().prepare('INSERT INTO attempts (key,count,reset) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN reset<? THEN 1 ELSE count+1 END, reset=CASE WHEN reset<? THEN excluded.reset ELSE reset END').bind(key,time+900000,time,time).run();const record=await db().prepare('SELECT count FROM attempts WHERE key=?').bind(key).first<any>();if(record.count>20)fail('Too many attempts. Please wait 15 minutes.',429);}
-async function newSession(member:string,req:Request){const token=uid()+'-'+uid();await db().batch([db().prepare('DELETE FROM sessions WHERE expires<?').bind(now()),db().prepare('DELETE FROM attempts WHERE reset<?').bind(now()),db().prepare('INSERT INTO sessions(token,member,expires) VALUES (?,?,?)').bind(await hash(token),member,now()+604800000)]);return response({ok:true},200,cookie(token,req));}
+async function newSession(member:string,req:Request){const token=uid()+'-'+uid();await db().batch([db().prepare('DELETE FROM sessions WHERE expires>0 AND expires<?').bind(now()),db().prepare('DELETE FROM attempts WHERE reset<?').bind(now()),db().prepare('INSERT INTO sessions(token,member,expires) VALUES (?,?,?)').bind(await hash(token),member,0)]);return response({ok:true},200,cookie(token,req));}
 async function handler(req:Request){
  if(req.method==='GET'){
   const user=await session(req);
@@ -92,5 +107,5 @@ async function handler(req:Request){
  if(b.action==='settings'){const size=Number(b.size);if(!Number.isInteger(size)||size<1||size>50)fail('Family size must be 1–50.');await db().prepare('UPDATE families SET name=?,size=?,budget=? WHERE id=?').bind(str(b.name,'Family name',2,60),size,money(b.budget,true),user.family).run();return response({ok:true});}
  fail('Unknown action.');
 }
-async function safe(req:Request){try{return await handler(req);}catch(e:any){if(e.message?.includes('UNIQUE constraint'))return response({error:'That name is already in use. Please choose another.'},409);if(!e.status)console.error('Hearth request failed',e.message);return response({error:e.status?e.message:'Something went wrong. Please try again.'},e.status||500);}}
+async function safe(req:Request){try{const result=await handler(req);const token=authenticatedTokens.get(req);if(token&&result.ok&&!result.headers.has('Set-Cookie'))result.headers.set('Set-Cookie',cookie(token,req));return result;}catch(e:any){if(e.message?.includes('UNIQUE constraint'))return response({error:'That name is already in use. Please choose another.'},409);if(!e.status)console.error('Hearth request failed',e.message);return response({error:e.status?e.message:'Something went wrong. Please try again.'},e.status||500);}}
 export const GET=safe;export const POST=safe;

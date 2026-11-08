@@ -156,3 +156,11 @@ The app has automated tests and browser checks. It has not undergone an independ
 ## Your next small step
 
 Create your real family, install the icon on two phones, and each record one small expense. Check that both phones show the same two expenses. Then try one monthly export. That is the clearest way to build confidence before inviting more families.
+
+## Staying signed in and recovery without a saved code
+
+The app no longer signs you out after seven days. After your next sign-in, your session stays valid until sign-out, password change, password recovery or operator revocation. The browser cookie is renewed as you use the app, with up to 400 days per renewal. Browser restrictions, clearing site data or changing phones can still require sign-in. Already expired sessions cannot be restored.
+
+Passwords are salted hashes and cannot be read back. The account owner can look up the family login name and member username in Cloudflare D1. If no recovery code was saved, a trusted operator with direct database access can issue a replacement one-time recovery code for a specifically identified member. The member then chooses a new password through the existing recovery screen. No public recovery bypass is provided. Keep the code private and generate/save a new recovery code after using it.
+
+Operator recovery uses `node scripts/owner-recovery.mjs --family <family-login> --username <username> --output <private-path-outside-repository>`. It requires your authenticated Cloudflare access and a configured deployment file, verifies the exact member, and issues a replacement one-time code without reading or changing the password. Keep the resulting file private. `--local` is for the isolated `.wrangler/recovery-qa` test database only.

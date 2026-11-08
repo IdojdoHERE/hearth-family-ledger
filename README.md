@@ -102,3 +102,9 @@ An example GitHub Actions workflow is in `docs/github-actions-example.yml`. Repo
 English and Albanian (Shqip) are included. The header and welcome page offer a language selector; the choice is stored on the device. Interface translations live in `lib/i18n.ts`. Stored category identifiers remain stable in English; labels are translated for display. Member names and expense notes are never automatically translated. Albanian date labels and European number formatting also work in browsers without Albanian Intl locale data. Run `node tests/i18n.mjs` to verify translations and formatting.
 
 The displayed app name is Family Ledger. The existing Worker name, repository URL, session cookie, queue keys and PWA identity are retained so existing users continue using the same app and data. See [OWNER-GUIDE.md](OWNER-GUIDE.md) for the hosting, domain and free-plan explanation.
+
+## Persistent sign-in (v1.2.0)
+
+Sessions no longer have a seven-day server expiry. `sessions.expires=0` means valid until explicit revocation. Valid legacy sessions upgrade on use; expired sessions are never revived. HttpOnly, SameSite=Lax cookies use a 400-day Max-Age and renew on successful authenticated requests. Sign-out, password changes and password recovery still revoke sessions. Browser cookie eviction and site-data clearing can still require sign-in.
+
+Run `node tests/session-persistence.mjs` against the isolated local `.wrangler/recovery-qa` preview to test renewal, legacy upgrade, expired rejection, recovery and revocation. The operator-only `scripts/owner-recovery.mjs` requires Cloudflare access and writes one-time recovery instructions outside the repository; it provides no public authentication bypass.

@@ -6,7 +6,7 @@ Do not include real household information, passwords, invitation links, or sessi
 - Family IDs are derived from server-side sessions, never accepted as authorization from clients.
 - Users see only their family's data; members edit their own expenses and admins can edit family expenses.
 - Passwords use PBKDF2-SHA256, 100,000 iterations, and per-user random salts (the current Workers runtime ceiling). Passwords require 12–128 characters. Consider a stronger supported password KDF as deployment options evolve.
-- Random session and invitation tokens are stored only as SHA-256 digests. Sessions expire after seven days. Cookies are HttpOnly, SameSite=Lax and Secure on HTTPS.
+- Random session and invitation tokens are stored only as SHA-256 digests. Sessions have no scheduled server expiry (`expires=0`) and are revoked on sign-out, password change or recovery. Persistent cookies last up to 400 days and renew on successful authenticated requests; browser storage rules can still require sign-in. Active legacy sessions upgrade on use; already expired sessions stay invalid. Cookies are HttpOnly, SameSite=Lax and Secure on HTTPS.
 - One-use invitations expire after 48 hours. An atomic D1 transaction claims invitations.
 - State-changing requests require a matching Origin and JSON content type.
 - Authentication attempts are rate-limited per platform-supplied client IP to 20 per 15 minutes. Direct self-hosted deployments must trust only platform-provided client IP headers. This is basic abuse protection, not a comprehensive edge WAF.
